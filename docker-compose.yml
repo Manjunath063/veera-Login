@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: login-backend
+    build: ./Backend
+    ports:
+      - "3008:3008"
+    depends_on:
+      - postgres
+    environment:
+      - PGUSER=postgres
+      - PGPASSWORD=admin123
+      - PGHOST=postgres
+      - PGPORT=5432
+      - PGDATABASE=login
+
+  forgot:
+    container_name: login-forgot
+    build: ./Forgot
+    ports:
+      - "9078:80"
+    depends_on:
+      - backend
+
+  login:
+    container_name: login-ui
+    build: ./Login
+    ports:
+      - "9079:80"
+    depends_on:
+      - backend
+
+  signup:
+    container_name: login-signup
+    build: ./Sign_Up
+    ports:
+      - "9080:80"
+    depends_on:
+      - backend
+
+  postgres:
+    container_name: login-postgres
+    image: postgres:13
+    ports:
+      - "5404:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin123
+      POSTGRES_DB: login
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres_data:
+
